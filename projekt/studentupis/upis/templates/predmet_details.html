@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalji predmeta: {{ predmet.naziv }}</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <style>
+        /* Additional styles for this specific page */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        h2 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        form {
+            margin-bottom: 10px;
+        }
+
+        form button {
+            background-color: #009879;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        form button:hover {
+            background-color: #007d6d;
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+        }
+
+        ul {
+            padding: 0;
+            list-style-type: none;
+        }
+
+        ul li {
+            margin-bottom: 10px;
+        }
+
+        ul li form {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a href="{% url 'home' %}">Početna</a>
+        </div>
+        <ul class="navbar-nav">
+            {% if user_role == 'admin' %}
+                <li><a href="{% url 'manage_subjects' %}">Popis predmeta</a></li>
+                <li><a href="{% url 'student_list' %}">Popis studenata</a></li>
+                <li><a href="{% url 'professor_list' %}">Popis profesora</a></li>
+                <li><a href="{% url 'add_subject' %}">Dodaj predmet</a></li>
+                <li><a href="{% url 'add_student' %}">Dodaj studenta</a></li>
+                <li><a href="{% url 'add_professor' %}">Dodaj profesora</a></li>
+            {% elif user_role == 'profesor' %}
+                <li><a href="{% url 'professor_subjects' %}">Predmeti</a></li>
+            {% elif user_role == 'student' %}
+                <li><a href="{% url 'student_upisni_list' %}">Upisni list</a></li>
+            {% endif %}
+            <li class="navbar-right"><a href="{% url 'logout' %}">Odjava</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Detalji predmeta: {{ predmet.naziv }}</h1>
+
+        <form method="post" action="{% url 'predmet_details' predmet.id %}">
+            {% csrf_token %}
+            <label for="filter">Filtriraj studente:</label>
+            <select name="filter" id="filter">
+                <option value="svi" {% if filter == 'svi' %}selected{% endif %}>Svi studenti</option>
+                <option value="izgubio_potpis" {% if filter == 'izgubio_potpis' %}selected{% endif %}>Studenti koji su izgubili potpis</option>
+                <option value="dobili_potpis" {% if filter == 'dobili_potpis' %}selected{% endif %}>Studenti koji su dobili potpis, ali nisu položili predmet</option>
+                <option value="polozili_predmet" {% if filter == 'polozili_predmet' %}selected{% endif %}>Studenti koji su položili predmet</option>
+            </select>
+            <button type="submit">Filtriraj</button>
+        </form>
+
+        <h2>Studenti:</h2>
+        <ul>
+            {% for upis in studenti %}
+                <li>
+                    {{ upis.student.username }} - {{ upis.get_status_display }}
+                    <form method="post" action="{% url 'predmet_details' predmet.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="upisni_list_id" value="{{ upis.id }}">
+                        <select name="status">
+                            <option value="upisan" {% if upis.status == 'upisan' %}selected{% endif %}>Upisan</option>
+                            <option value="polozen" {% if upis.status == 'polozen' %}selected{% endif %}>Položen</option>
+                            <option value="izgubio_potpis" {% if upis.status == 'izgubio_potpis' %}selected{% endif %}>Izgubio potpis</option>
+                        </select>
+                        <button type="submit" name="update_status">Ažuriraj status</button>
+                    </form>
+                    {% if upis.status == 'upisan' %}
+                    <form method="post" action="{% url 'predmet_details' predmet.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="upisni_list_id" value="{{ upis.id }}">
+                        <button type="submit" name="remove">Ispiši predmet</button>
+                    </form>
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li>Nema studenata za prikaz.</li>
+            {% endfor %}
+        </ul>
+
+        <br>
+        <a href="{% url 'professor_subjects' %}">Natrag na listu predmeta</a>
+    </div>
+</body>
+</html>
+

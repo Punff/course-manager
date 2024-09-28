@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uredi upisni list - {{ request.user.username }}</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a href="{% url 'home' %}">Početna</a>
+        </div>
+        <ul class="navbar-nav">
+            {% if user_role == 'admin' %}
+                <li><a href="{% url 'manage_subjects' %}">Popis predmeta</a></li>
+                <li><a href="{% url 'student_list' %}">Popis studenata</a></li>
+                <li><a href="{% url 'professor_list' %}">Popis profesora</a></li>
+                <li><a href="{% url 'add_subject' %}">Dodaj predmet</a></li>
+                <li><a href="{% url 'add_student' %}">Dodaj studenta</a></li>
+                <li><a href="{% url 'add_professor' %}">Dodaj profesora</a></li>
+            {% elif user_role == 'profesor' %}
+                <li><a href="{% url 'professor_subjects' %}">Predmeti</a></li>
+            {% elif user_role == 'student' %}
+                <li><a href="{% url 'student_upisni_list' %}">Upisni list</a></li>
+            {% endif %}
+            <li class="navbar-right"><a href="{% url 'logout' %}">Odjava</a></li>
+        </ul>
+    </nav>
+    <h1>Dobrodošli, {{ request.user.username }}</h1>
+    {% if error %}
+                <h3 style="color: red; text-align: center;">
+                    {{ error }}
+                </h3>
+            {% endif %}
+    <div class="left">
+        <h2>Predmeti:</h2>
+        <ul>
+            {% for predmet in predmeti %}
+                <li>
+                    <form method="post" action="{% url 'student_upisni_list' %}">
+                        <button type="submit">Upiši</button>
+                        {{ predmet.naziv }} (Semestar: {{ predmet.sem_red }})
+                        {% csrf_token %}
+                        <input type="hidden" name="predmet" value="{{ predmet.id }}">
+                        <input type="hidden" name="semestar" value="{{ predmet.sem_red }}">
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="right">
+        <h2>Upisi:</h2>
+        {% for semestar in semestri %}
+            <div class="semestar">
+                <h3>Semestar {{ semestar }}:</h3>
+                <ul>
+                    {% for upis in upisni_predmeti %}
+                        {% if upis.semestar == semestar %}
+                            <li>
+                                <form method="post" action="{% url 'remove_predmet_from_upisni_list' student.id upis.predmet.id %}" style="display: inline;">
+                                    <button type="submit">Ukloni</button>
+                                    {{ upis.predmet.naziv }} - {{ upis.get_status_display }}
+                                    {% csrf_token %}
+                                </form>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+    <br>
+</body>
+</html>
+

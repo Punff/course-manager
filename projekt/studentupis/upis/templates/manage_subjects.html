@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregled Predmeta</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a href="{% url 'home' %}">Početna</a>
+        </div>
+        <ul class="navbar-nav">
+            {% if user_role == 'admin' %}
+                <li><a href="{% url 'manage_subjects' %}">Popis predmeta</a></li>
+                <li><a href="{% url 'student_list' %}">Popis studenata</a></li>
+                <li><a href="{% url 'professor_list' %}">Popis profesora</a></li>
+                <li><a href="{% url 'add_subject' %}">Dodaj predmet</a></li>
+                <li><a href="{% url 'add_student' %}">Dodaj studenta</a></li>
+                <li><a href="{% url 'add_professor' %}">Dodaj profesora</a></li>
+            {% elif user_role == 'profesor' %}
+                <li><a href="{% url 'professor_subjects' %}">Predmeti</a></li>
+            {% elif user_role == 'student' %}
+                <li><a href="{% url 'student_upisni_list' %}">Upisni list</a></li>
+            {% endif %}
+            <li class="navbar-right"><a href="{% url 'logout' %}">Odjava</a></li>
+        </ul>
+    </nav>
+    <h1>Pregled Predmeta</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Naziv</th>
+                <th>Kod</th>
+                <th>Program</th>
+                <th>ECTS</th>
+                <th>Semestar Redovni</th>
+                <th>Izborni</th>
+                <th>Nositelj</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subject in subjects %}
+                <tr>
+                    <td>{{ subject.naziv }}</td>
+                    <td>{{ subject.kod }}</td>
+                    <td>{{ subject.program }}</td>
+                    <td>{{ subject.ects }}</td>
+                    <td>{{ subject.sem_red }}</td>
+                    <td>{{ subject.izborni }}</td>
+                    <td>{{ subject.nositelj.username }}</td>
+                    <td><a href="{% url 'edit_subject' subject.id %}">Uredi</a></td>
+                    <td><a href="{% url 'show_upisni_list' subject.id %}">Popis studenta</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br><a href="{% url 'home' %}">Početna stranica</a>
+</body>
+</html>
+

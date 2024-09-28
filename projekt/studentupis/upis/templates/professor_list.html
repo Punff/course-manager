@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista profesora</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a href="{% url 'home' %}">Početna</a>
+        </div>
+        <ul class="navbar-nav">
+            {% if user_role == 'admin' %}
+                <li><a href="{% url 'manage_subjects' %}">Popis predmeta</a></li>
+                <li><a href="{% url 'student_list' %}">Popis studenata</a></li>
+                <li><a href="{% url 'professor_list' %}">Popis profesora</a></li>
+                <li><a href="{% url 'add_subject' %}">Dodaj predmet</a></li>
+                <li><a href="{% url 'add_student' %}">Dodaj studenta</a></li>
+                <li><a href="{% url 'add_professor' %}">Dodaj profesora</a></li>
+            {% elif user_role == 'profesor' %}
+                <li><a href="{% url 'professor_subjects' %}">Predmeti</a></li>
+            {% elif user_role == 'student' %}
+                <li><a href="{% url 'student_upisni_list' %}">Upisni list</a></li>
+            {% endif %}
+            <li class="navbar-right"><a href="{% url 'logout' %}">Odjava</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Lista profesora</h1>
+        <table class="professor-table">
+            <thead>
+                <tr>
+                    <th>Ime</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for professor in professors %}
+                    <tr>
+                        <td>{{ professor.username }}</td>
+                        <td>{{ professor.email }}</td>
+                        <td><a href="{% url 'edit_professor' professor.id %}">Uredi</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+    </div>
+</body>
+</html>
+

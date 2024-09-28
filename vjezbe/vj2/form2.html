@@ -1,0 +1,43 @@
+<html>
+<head>
+    <title>Forma</title>
+</head>
+<body>
+    <form action="form2.py">
+        <table border="1">
+            <tr>
+                <th>Status:</th>
+                <th>
+                    <input type="radio" name="status" value="red">Redovan</input>
+                    <input type="radio" name="status" value="izv">Izvanredan</input>
+                </th>
+            </tr>
+            <tr>
+                <th>Email:</th>
+                <th>
+                    <input type="email" placeholder="primjer@primjer.com"></input>
+                </th>
+            </tr>
+            <tr>
+                <th>Smjer:</th>
+                <th>
+                    <select name="smjer" id="smjer">
+                        <option value="BP">Baze Podataka</option>
+                        <option value="RM">Računalne Mreže</option>
+                        <option value="WEB">Web Programiranje</option>
+                      </select> 
+                </th>
+            </tr>
+            <tr>
+                <th>Završni:</th>
+                <th>
+                    <input type="checkbox">
+                </th>
+            </tr>
+            <tr>
+                <th><button>Next</button></th>
+            </tr>
+        </table>       
+    </form>
+</body>
+</html>
